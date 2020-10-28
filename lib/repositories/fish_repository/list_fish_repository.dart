@@ -7,26 +7,17 @@ import 'fish_repository.dart';
 
 class ListFishRepository extends FishRepository {
   List<Fish> _fish = [];
-  final SharedPreferences prefs;
 
-  ListFishRepository(this.prefs) {
-    _fish = (prefs.getStringList("fish") ?? [])
-        .map((e) => Fish.fromJson(jsonDecode(e)))
-        .toList();
-  }
+  ListFishRepository();
 
   @override
   void addFish(Fish fish) {
     _fish.add(fish);
-    prefs.setStringList(
-        "fish", _fish.map((e) => jsonEncode(e.toJson())).toList());
   }
 
   @override
   void removeFish(Fish fish) {
     _fish.remove(fish);
-    prefs.setStringList(
-        "fish", _fish.map((e) => jsonEncode(e.toJson())).toList());
   }
 
   @override

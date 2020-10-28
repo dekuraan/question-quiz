@@ -25,7 +25,8 @@ class FishDatabaseApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: BlocProvider(
-        create: (context) => FishDatabaseCubit(ListFishRepository(this.prefs)),
+        create: (context) =>
+            FishDatabaseCubit(ListFishRepository(), this.prefs),
         child: HomePage(),
       ),
     );
