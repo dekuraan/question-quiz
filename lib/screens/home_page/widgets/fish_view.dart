@@ -1,5 +1,4 @@
 import 'package:fish_database/fish.dart';
-import 'package:fish_database/water_type.dart';
 import 'package:flutter/material.dart';
 
 class FishView extends StatelessWidget {
@@ -8,23 +7,53 @@ class FishView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(fish.species),
-      leading: Text(waterTypeToEmoji(fish.waterType)),
-      subtitle: Text("${fish.weight} kg"),
-      trailing: Text("${fish.children} children"),
+      title: Text(fish.question),
+      subtitle: Text(fish.answer),
+      trailing: RaisedButton(
+        child: Text("Ask Question"),
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (builderContext) {
+              final aController = TextEditingController();
+              return AlertDialog(
+                title: Text(fish.question),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        controller: aController,
+                        decoration: InputDecoration(
+                          labelText: "Answer",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    RaisedButton(
+                      child: Text("submit"),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        if (fish.answer == aController.text) {
+                          Scaffold.of(context).showSnackBar(
+                              SnackBar(content: Text("Correct!")));
+                        } else {
+                          Scaffold.of(context).showSnackBar(SnackBar(
+                              content: Text(
+                                  "The correct answer was ${fish.answer}")));
+                        }
+                      },
+                    )
+                  ],
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
-  }
-
-  String waterTypeToEmoji(WaterType waterType) {
-    if (waterType == WaterType.Salt) {
-      return '🧂';
-    }
-    if (waterType == WaterType.Fresh) {
-      return '💧';
-    }
-    if (waterType == WaterType.Brackish) {
-      return '🏞️';
-    }
-    return "❗";
   }
 }

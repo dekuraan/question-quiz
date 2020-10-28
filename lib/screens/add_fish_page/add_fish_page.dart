@@ -1,10 +1,7 @@
 import 'package:fish_database/blocs/fish_database_cubit/fish_database_cubit.dart';
 import 'package:fish_database/fish.dart';
-import 'package:fish_database/screens/add_fish_page/widgets/water_type_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'widgets/weight_slider.dart';
 
 class AddPage extends StatefulWidget {
   @override
@@ -12,14 +9,13 @@ class AddPage extends StatefulWidget {
 }
 
 class _AddPageState extends State<AddPage> {
-  final speciesController = TextEditingController();
-  WeightCubit weightCubit = WeightCubit();
-  WaterTypeCubit waterTypeCubit = WaterTypeCubit();
+  final qController = TextEditingController();
+  final aController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add a Fish'),
+        title: Text('Add a Question'),
       ),
       body: Center(
         child: Padding(
@@ -34,25 +30,21 @@ class _AddPageState extends State<AddPage> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
-                    controller: speciesController,
+                    controller: qController,
                     decoration: InputDecoration(
-                      labelText: "Species",
+                      labelText: "Question",
                       border: OutlineInputBorder(),
                     ),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: BlocProvider(
-                    create: (BuildContext context) => weightCubit,
-                    child: WeightSlider(),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: BlocProvider(
-                    create: (BuildContext context) => waterTypeCubit,
-                    child: WaterTypePicker(),
+                  child: TextFormField(
+                    controller: aController,
+                    decoration: InputDecoration(
+                      labelText: "Answer",
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                 ),
                 RaisedButton(
@@ -60,9 +52,8 @@ class _AddPageState extends State<AddPage> {
                   onPressed: () {
                     BlocProvider.of<FishDatabaseCubit>(context).addFish(
                       Fish(
-                        speciesController.text,
-                        weightCubit.state.round(),
-                        waterTypeCubit.state,
+                        qController.text,
+                        aController.text,
                       ),
                     );
                     Navigator.of(context).pop();

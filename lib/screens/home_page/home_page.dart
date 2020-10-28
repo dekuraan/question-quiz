@@ -4,7 +4,6 @@ import 'package:fish_database/blocs/fish_database_cubit/fish_database_cubit.dart
 import 'package:fish_database/fish.dart';
 import 'package:fish_database/screens/add_fish_page/add_fish_page.dart';
 import 'package:fish_database/screens/home_page/widgets/fish_view.dart';
-import 'package:fish_database/water_type.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -26,88 +25,103 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text('Fishbase 9000 (TM)'),
-          actions: [
-            DropdownButton<FishComponent>(
-              value: sortBy,
-              icon: IconButton(
-                icon:
-                    Icon(ascending ? Icons.arrow_downward : Icons.arrow_upward),
-                onPressed: () => setState(() => ascending = !ascending),
-              ),
-              onChanged: (FishComponent newValue) {
-                setState(() {
-                  sortBy = newValue;
-                });
-              },
-              items: [
-                DropdownMenuItem(
-                  child: Text("Species"),
-                  value: FishComponent.Species,
-                ),
-                DropdownMenuItem(
-                  child: Text("Weight"),
-                  value: FishComponent.Weight,
-                ),
-                DropdownMenuItem(
-                  child: Text("Water Type"),
-                  value: FishComponent.WaterType,
-                ),
-                DropdownMenuItem(
-                  child: Text("Children"),
-                  value: FishComponent.Children,
-                ),
-              ],
-            )
-          ],
+          title: Text('Questionbase 9000 (TM)'),
         ),
         body: BlocBuilder<FishDatabaseCubit, UnmodifiableListView<Fish>>(
           builder: (context, state) {
-            final fishies = state.toList();
-            fishies.sort((current, next) {
-              if (sortBy == FishComponent.Species) {
-                return (ascending ? 1 : -1) *
-                    current.species.compareTo(next.species);
-              }
-              if (sortBy == FishComponent.Weight) {
-                return (ascending ? 1 : -1) *
-                    current.weight.compareTo(next.weight);
-              }
-              if (sortBy == FishComponent.WaterType) {
-                return (ascending ? 1 : -1) *
-                    WaterType.values
-                        .indexOf(current.waterType)
-                        .compareTo(WaterType.values.indexOf(next.waterType));
-              }
-              if (sortBy == FishComponent.Children) {
-                return (ascending ? 1 : -1) *
-                    current.children.compareTo(next.children);
-              }
-              return null;
-            });
-            return fishies.isEmpty
+            return state.isEmpty
                 ? Center(
                     child: Text(
-                        "Add some fishies by pressing the '+' button!\nSort with the dropdown in the top left.\nSwipe any fish to remove them."),
+                        "Add some questions by pressing the '+' button!\nSwipe any questions to remove them.\nQuestions are saved to your cookies!"),
                   )
-                : ListView.builder(
-                    itemBuilder: (context, index) {
-                      final fish = fishies[index];
-                      return Dismissible(
-                        child: FishView(fish),
-                        key: Key(fish.toString()),
-                        background: Container(color: Colors.red),
-                        onDismissed: (_) {
-                          BlocProvider.of<FishDatabaseCubit>(context)
-                              .removeFish(fish);
-                          Scaffold.of(context).showSnackBar(SnackBar(
-                            content: Text(
-                                "Removed ${fish.weight} kg ${fish.species}"),
-                          ));
-                        },
-                      );
-                    },
-                    itemCount: state.length,
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: RaisedButton(
+                          child: Text("Ask all questions"),
+                          onPressed: () {
+                            void recursiveShowAllQuestions(int i) {
+                              if (i == state.length) {
+                                return;
+                              }
+                              showDialog(
+                                context: context,
+                                builder: (builderContext) {
+                                  final aController = TextEditingController();
+                                  final fish = state[i];
+                                  return AlertDialog(
+                                    title: Text(fish.question),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: TextFormField(
+                                            controller: aController,
+                                            decoration: InputDecoration(
+                                              labelText: "Answer",
+                                              border: OutlineInputBorder(),
+                                            ),
+                                          ),
+                                        ),
+                                        RaisedButton(
+                                          child: Text("submit"),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                            if (fish.answer ==
+                                                aController.text) {
+                                              Scaffold.of(context).showSnackBar(
+                                                  SnackBar(
+                                                      content:
+                                                          Text("Correct!")));
+                                            } else {
+                                              Scaffold.of(context).showSnackBar(
+                                                  SnackBar(
+                                                      content: Text(
+                                                          "The correct answer was ${fish.answer}")));
+                                            }
+                                            recursiveShowAllQuestions(i + 1);
+                                          },
+                                        )
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            }
+
+                            recursiveShowAllQuestions(0);
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          itemBuilder: (context, index) {
+                            final fish = state[index];
+                            return Dismissible(
+                              child: FishView(fish),
+                              key: Key(fish.toString()),
+                              background: Container(color: Colors.red),
+                              onDismissed: (_) {
+                                BlocProvider.of<FishDatabaseCubit>(context)
+                                    .removeFish(fish);
+                                Scaffold.of(context).showSnackBar(SnackBar(
+                                  content: Text(
+                                      "Removed ${fish.question} ${fish.answer}"),
+                                ));
+                              },
+                            );
+                          },
+                          itemCount: state.length,
+                        ),
+                      ),
+                    ],
                   );
           },
         ),

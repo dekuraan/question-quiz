@@ -6,8 +6,8 @@ import 'package:fish_database/repositories/fish_repository/fish_repository.dart'
 import 'package:fish_database/repositories/fish_repository/list_fish_repository.dart';
 
 class FishDatabaseCubit extends Cubit<UnmodifiableListView<Fish>> {
-  final FishRepository fishRepo = ListFishRepository();
-  FishDatabaseCubit() : super(UnmodifiableListView([]));
+  final FishRepository fishRepo;
+  FishDatabaseCubit(this.fishRepo) : super(UnmodifiableListView([]));
   void addFish(Fish fish) {
     fishRepo.addFish(fish);
     emit(fishRepo.fishList);

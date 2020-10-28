@@ -1,18 +1,13 @@
-import 'water_type.dart';
-
 class Fish {
-  Fish(this.species, this.weight, this.waterType);
-  final String species;
-  final int weight;
-  final WaterType waterType;
-  int get children => factorial(weight);
-}
+  Fish(this.question, this.answer);
+  final String question;
+  final String answer;
 
-int factorial(
-  int x,
-) {
-  if (x <= 1) {
-    return 1;
-  }
-  return x * factorial(x - 1);
+  Map<String, dynamic> toJson() => {
+        'q': question,
+        'a': answer,
+      };
+  Fish.fromJson(Map<String, dynamic> json)
+      : question = json['q'],
+        answer = json['a'];
 }
